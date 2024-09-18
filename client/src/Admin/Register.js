@@ -1,165 +1,166 @@
+// components/Register.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     mobile: '',
-    empID: '',
+    emp_id: '',
     dob: '',
-    gender: '',
+    gender: 'Male', // Default gender selection
     password: '',
-    confirmPassword: ''
+    confirm_password: '',
   });
 
-  const [formErrors, setFormErrors] = useState({});
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  // Handle input change
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const validateForm = () => {
-    const errors = {};
-    const emailRegex = /\S+@\S+\.\S+/;
-
-    if (!formData.name) errors.name = 'Name is required';
-    if (!formData.email || !emailRegex.test(formData.email)) errors.email = 'Valid email is required';
-    if (!formData.mobile || formData.mobile.length < 10) errors.mobile = 'Valid mobile number is required';
-    if (!formData.empID) errors.empID = 'Employee ID is required';
-    if (!formData.dob) errors.dob = 'Date of birth is required';
-    if (!formData.gender) errors.gender = 'Gender is required';
-    if (!formData.password) errors.password = 'Password is required';
-    if (formData.password !== formData.confirmPassword) errors.confirmPassword = 'Passwords do not match';
-
-    return errors;
-  };
-
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errors = validateForm();
-    setFormErrors(errors);
+    setError('');
+    setSuccess('');
 
-    if (Object.keys(errors).length === 0) {
-      try {
-        // Send a POST request to the registration API
-        const response = await axios.post('http://localhost:5000/emp/register', formData);
-        
-        if (response.status === 200) {
-          alert('Registration successful!');
-          navigate('/'); // Navigate to the login page after successful registration
-        }
-      } catch (error) {
-        alert('Failed to register. Please try again.');
-      }
+    // Validate that passwords match
+    if (formData.password !== formData.confirm_password) {
+      setError("Passwords don't match.");
+      return;
+    }
+
+    try {
+      // Send form data to backend for registration
+      await axios.post('http://localhost:5000/emp/register', formData);
+      navigate('/');
+      alert('Registration successful! Please log in.');
+    } catch (err) {
+      setError(err.response?.data?.error || 'An error occurred during registration.');
     }
   };
 
   return (
     <div style={styles.container}>
-      <h2>Register New Employee</h2>
+      <h2 style={styles.title}>Register</h2>
+      {error && <p style={styles.error}>{error}</p>}
+      {success && <p style={styles.success}>{success}</p>}
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputGroup}>
-          <label>Name<span style={styles.required}>*</span></label>
+          <label>Name:</label>
           <input
             type="text"
             name="name"
             value={formData.name}
-            onChange={handleInputChange}
+            onChange={handleChange}
             style={styles.input}
+            required
           />
-          {formErrors.name && <span style={styles.error}>{formErrors.name}</span>}
         </div>
+
         <div style={styles.inputGroup}>
-          <label>Email<span style={styles.required}>*</span></label>
+          <label>Email:</label>
           <input
             type="email"
             name="email"
             value={formData.email}
-            onChange={handleInputChange}
+            onChange={handleChange}
             style={styles.input}
+            required
           />
-          {formErrors.email && <span style={styles.error}>{formErrors.email}</span>}
         </div>
+
         <div style={styles.inputGroup}>
-          <label>Mobile<span style={styles.required}>*</span></label>
+          <label>Mobile:</label>
           <input
-            type="text"
+            type="tel"
             name="mobile"
             value={formData.mobile}
-            onChange={handleInputChange}
+            onChange={handleChange}
             style={styles.input}
+            required
           />
-          {formErrors.mobile && <span style={styles.error}>{formErrors.mobile}</span>}
         </div>
+
         <div style={styles.inputGroup}>
-          <label>Employee ID<span style={styles.required}>*</span></label>
+          <label>Employee ID:</label>
           <input
             type="text"
-            name="empID"
-            value={formData.empID}
-            onChange={handleInputChange}
+            name="emp_id"
+            value={formData.emp_id}
+            onChange={handleChange}
             style={styles.input}
+            required
           />
-          {formErrors.empID && <span style={styles.error}>{formErrors.empID}</span>}
         </div>
+
         <div style={styles.inputGroup}>
-          <label>Date of Birth<span style={styles.required}>*</span></label>
+          <label>Date of Birth:</label>
           <input
             type="date"
             name="dob"
             value={formData.dob}
-            onChange={handleInputChange}
+            onChange={handleChange}
             style={styles.input}
+            required
           />
-          {formErrors.dob && <span style={styles.error}>{formErrors.dob}</span>}
         </div>
+
         <div style={styles.inputGroup}>
-          <label>Gender<span style={styles.required}>*</span></label>
+          <label>Gender:</label>
           <select
             name="gender"
             value={formData.gender}
-            onChange={handleInputChange}
-            style={styles.input}
+            onChange={handleChange}
+            style={styles.select}
+            required
           >
-            <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
           </select>
-          {formErrors.gender && <span style={styles.error}>{formErrors.gender}</span>}
         </div>
+
         <div style={styles.inputGroup}>
-          <label>Password<span style={styles.required}>*</span></label>
+          <label>Password:</label>
           <input
             type="password"
             name="password"
             value={formData.password}
-            onChange={handleInputChange}
+            onChange={handleChange}
             style={styles.input}
+            required
           />
-          {formErrors.password && <span style={styles.error}>{formErrors.password}</span>}
         </div>
+
         <div style={styles.inputGroup}>
-          <label>Confirm Password<span style={styles.required}>*</span></label>
+          <label>Confirm Password:</label>
           <input
             type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
+            name="confirm_password"
+            value={formData.confirm_password}
+            onChange={handleChange}
             style={styles.input}
+            required
           />
-          {formErrors.confirmPassword && <span style={styles.error}>{formErrors.confirmPassword}</span>}
         </div>
-        <button type="submit" style={styles.button}>Submit</button>
+
+        <button type="submit" style={styles.button}>Register</button>
       </form>
     </div>
   );
 };
 
+// Inline styles for the Register component
 const styles = {
   container: {
     width: '400px',
@@ -168,6 +169,11 @@ const styles = {
     border: '1px solid #ccc',
     borderRadius: '5px',
     textAlign: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+  title: {
+    fontSize: '24px',
+    marginBottom: '20px',
   },
   form: {
     display: 'flex',
@@ -175,12 +181,23 @@ const styles = {
   },
   inputGroup: {
     marginBottom: '15px',
+    textAlign: 'left',
   },
   input: {
     width: '100%',
     padding: '10px',
-    margin: '5px 0',
+    marginTop: '5px',
     boxSizing: 'border-box',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
+  },
+  select: {
+    width: '100%',
+    padding: '10px',
+    marginTop: '5px',
+    boxSizing: 'border-box',
+    borderRadius: '4px',
+    border: '1px solid #ccc',
   },
   button: {
     padding: '10px 20px',
@@ -192,11 +209,11 @@ const styles = {
   },
   error: {
     color: 'red',
-    fontSize: '12px',
+    fontSize: '14px',
   },
-  required: {
-    color: 'red',
-    marginLeft: '5px',
+  success: {
+    color: 'green',
+    fontSize: '14px',
   },
 };
 
