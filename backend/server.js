@@ -2,6 +2,7 @@
 const express = require('express');
 const sequelize = require('./config/database');
 const empRoutes = require('./routes/empRoutes');
+const userRoutes = require('./routes/userRoutes');
 const cors = require('cors');
 
 
@@ -17,6 +18,7 @@ sequelize.sync()
 
 // Use routes
 app.use('/emp', empRoutes);
+app.use('/users', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
