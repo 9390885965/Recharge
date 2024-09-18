@@ -44,7 +44,7 @@ const Login = () => {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    navigate('/register');
+    navigate('/admin/register');
   };
 
   return (
