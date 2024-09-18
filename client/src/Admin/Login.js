@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const Login = () => {
-  const [empID, setEmpID] = useState('');
+  const [emp_id, setEmpID] = useState('');
   const [password, setPassword] = useState('');
   const [empIDError, setEmpIDError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     
     // Validate empID and password
-    if (empID === '') {
+    if (emp_id === '') {
       setEmpIDError(true);
     } else {
       setEmpIDError(false);
@@ -27,10 +27,10 @@ const Login = () => {
     }
 
     // Proceed to login only if both empID and password are provided
-    if (empID && password) {
+    if (emp_id && password) {
       try {
         // Send a POST request to the login API
-        const response = await axios.post('http://localhost:5000/emp/login', { empID, password });
+        const response = await axios.post('http://localhost:5000/emp/login', { emp_id, password });
 
         if (response.status === 200) {
           alert('Login successful');
@@ -58,7 +58,7 @@ const Login = () => {
           <input
             type="text"
             id="empID"
-            value={empID}
+            value={emp_id}
             onChange={(e) => setEmpID(e.target.value)}
             placeholder="Enter Employee ID"
             style={styles.input}
